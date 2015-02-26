@@ -61,12 +61,14 @@
 		// send command to server along with the entity, or use last selected if it didn't change
 		private function sendEnt(args:Object) {
 			var pID = globals.Players.GetLocalPlayer();
-			if( globals.Players.GetQueryUnit(pID) != -1 ) {
-				hideMe();
-			} else if( globals.Players.GetSelectedEntities(pID)[0]!=null ) {
-				lastSelect = globals.Players.GetSelectedEntities(pID)[0];
-				gameAPI.SendServerCommand( serverCommand + " " + lastSelect );
-			} else if( lastArgs != null ) prepareDelay(lastArgs);
+			if( pID == args.player_ID ) {
+				if( globals.Players.GetQueryUnit(pID) != -1 ) {
+					hideMe();
+				} else if( globals.Players.GetSelectedEntities(pID)[0]!=null ) {
+					lastSelect = globals.Players.GetSelectedEntities(pID)[0];
+					gameAPI.SendServerCommand( serverCommand + " " + lastSelect );
+				} else if( lastArgs != null ) prepareDelay(lastArgs);
+			}
 		}
 		
 		// hide the abils
