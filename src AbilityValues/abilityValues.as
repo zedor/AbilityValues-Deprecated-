@@ -61,14 +61,15 @@
 		// send command to server along with the entity, or use last selected if it didn't change
 		private function sendEnt(args:Object) {
 			var pID = globals.Players.GetLocalPlayer();
-			if( pID == args.player_ID ) {
-				if( globals.Players.GetQueryUnit(pID) != -1 ) {
-					hideMe();
-				} else if( globals.Players.GetSelectedEntities(pID)[0]!=null ) {
-					lastSelect = globals.Players.GetSelectedEntities(pID)[0];
-					gameAPI.SendServerCommand( serverCommand + " " + lastSelect );
-				} else if( lastArgs != null ) prepareDelay(lastArgs);
-			}
+			trace("[AbilityValue] Unit click detected");
+			if( globals.Players.GetQueryUnit(pID) != -1 ) {
+				trace("[AbilityValue] Unit queried, hide overlay");
+				hideMe();
+			} else if( globals.Players.GetSelectedEntities(pID)[0]!=null && globals.Players.GetSelectedEntities(pID)[0]!=lastSelect ) {
+				lastSelect = globals.Players.GetSelectedEntities(pID)[0];
+				trace("[AbilityValue] sending server command ", serverCommand, " with entity #: ", lastSelect);
+				gameAPI.SendServerCommand( serverCommand + " " + lastSelect );
+			} else if( lastArgs != null ) prepareDelay(lastArgs);
 		}
 		
 		// hide the abils
@@ -82,6 +83,7 @@
 		
 		// iterates over the values provided by the event and handles them
 		private function updateOverlay( args:Object ) {
+			trace("[AbilityValue] updating overlay");
 			lastArgs = args;
 			var i = 0;
 			while (i < abMax) {
@@ -102,9 +104,14 @@
 		
 		//fire the timer
 		private function prepareDelay(args:Object) {
-			holdArgs = args;
-			bestTimer.reset();
-			bestTimer.start();
+			trace("[AbilityValues] Timer received, checking player ID");
+			var pID = globals.Players.GetLocalPlayer();
+			if( pID == args.player_ID ) {
+				trace("[AbilityValues] Player ID OK!");
+				holdArgs = args;
+				bestTimer.reset();
+				bestTimer.start();
+			}
 		}
 		
 		// handles hue change
@@ -200,6 +207,7 @@
 			var _settings = Globals.instance.GameInterface.LoadKVFile('scripts/AbilityValues_settings.kv');
 			defHue = int(_settings["defHue"]);
 			serverCommand = _settings["serverCommand"];
+			trace("[AbilityValues] KV Loaded, default hue is ", defHue, " and ConVar is ", serverCommand);
 		}
 		
 		public function onLoaded() : void {			
