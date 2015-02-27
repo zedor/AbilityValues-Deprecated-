@@ -1,6 +1,6 @@
 # AbilityValues
 
-Adds stuff to ability bar
+Adds an additional value to the ability icon
 
 [Preview](http://puu.sh/ge6Bz/7c0b44adab.jpg)
 
