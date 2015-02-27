@@ -61,13 +61,13 @@
 		// send command to server along with the entity, or use last selected if it didn't change
 		private function sendEnt(args:Object) {
 			var pID = globals.Players.GetLocalPlayer();
-			trace("[AbilityValue] Unit click detected");
+			trace("[AbilityValues] Unit click detected");
 			if( globals.Players.GetQueryUnit(pID) != -1 ) {
-				trace("[AbilityValue] Unit queried, hide overlay");
+				trace("[AbilityValues] Unit queried, hide overlay");
 				hideMe();
 			} else if( globals.Players.GetSelectedEntities(pID)[0]!=null && globals.Players.GetSelectedEntities(pID)[0]!=lastSelect ) {
 				lastSelect = globals.Players.GetSelectedEntities(pID)[0];
-				trace("[AbilityValue] sending server command ", serverCommand, " with entity #: ", lastSelect);
+				trace("[AbilityValues] sending server command ", serverCommand, " with entity #: ", lastSelect);
 				gameAPI.SendServerCommand( serverCommand + " " + lastSelect );
 			} else if( lastArgs != null ) prepareDelay(lastArgs);
 		}
@@ -83,7 +83,7 @@
 		
 		// iterates over the values provided by the event and handles them
 		private function updateOverlay( args:Object ) {
-			trace("[AbilityValue] updating overlay");
+			trace("[AbilityValues] updating overlay");
 			lastArgs = args;
 			var i = 0;
 			while (i < abMax) {
