@@ -44,6 +44,7 @@
 		
 		// kv load vars
 		private var defHue:int;
+		private var defBri:int;
 		private var serverCommand:String;
 		
 		//volvo is stoopid so we use timers nao, and something that holds our arguments while we wait for valve to get their shit together
@@ -59,7 +60,9 @@
 		}
 		
 		// send command to server along with the entity, or use last selected if it didn't change
-		private function sendEnt(args:Object) {
+		// "dota_player_update_selected_unit"
+		// "dota_player_update_query_unit"
+		private function dotoEventHandle(args:Object) {
 			var pID = globals.Players.GetLocalPlayer();
 			trace("[AbilityValues] Unit click detected");
 			if( globals.Players.GetQueryUnit(pID) != -1 ) {
@@ -70,6 +73,24 @@
 				trace("[AbilityValues] sending server command ", serverCommand, " with entity #: ", lastSelect);
 				gameAPI.SendServerCommand( serverCommand + " " + lastSelect );
 			} else if( lastArgs != null ) prepareDelay(lastArgs);
+		}
+		
+		// send command to server along with the entity, dont use last selected
+		// "ability_values_force_check"
+		private function sendEnt(args:Object) {
+			var pID = globals.Players.GetLocalPlayer();
+			
+			if( pID == args.player_ID ) {
+				trace("[AbilityValues] \"ability_values_force_check\" received");
+				if( globals.Players.GetQueryUnit(pID) != -1 ) {
+					trace("[AbilityValues] \"ability_values_force_check\" - Unit queried, hide overlay");
+					hideMe();
+				}  else if( globals.Players.GetSelectedEntities(pID)[0]!=null ) {
+					lastSelect = globals.Players.GetSelectedEntities(pID)[0]; 
+					trace("[AbilityValues] \"ability_values_force_check\" - sending server command ", serverCommand, " with entity #: ", lastSelect);
+					gameAPI.SendServerCommand( serverCommand + " " + lastSelect );
+				}
+			}
 		}
 		
 		// hide the abils
@@ -90,19 +111,24 @@
 				if( args["val_"+(i+1)]!= "0" ) {
 					showAndPosOvr(args["val_"+(i+1)], i);
 					if( args["hue_"+(i+1)]!= "0" ) {
-						setHue(args["hue_"+(i+1)], i);
-					} else setHue(defHue, i);
+						setHue(args["hue_"+(i+1)]);
+					} else setHue(defHue);
+					if( args["bri_"+(i+1)]!= "0" ) {
+						setBri(args["bri_"+(i+1)]);
+					} else setBri(defBri);
+					updateFilter(i);
 				} else lmCost[i].visible = false;
 				i++;
 			} 
 		}
 		
-		//fire the command sending handler
+		// fire the command sending handler
 		private function delayEvent(e:TimerEvent) {
 			updateOverlay(holdArgs);
 		}
 		
-		//fire the timer
+		// fire the timer
+		// "ability_values_send"
 		private function prepareDelay(args:Object) {
 			trace("[AbilityValues] Timer received, checking player ID");
 			var pID = globals.Players.GetLocalPlayer();
@@ -114,15 +140,26 @@
 			}
 		}
 		
-		// handles hue change
-		private function setHue(val:int, i:int) {
+		// handles huehue change
+		private function setHue(val:int) {
 			if( val < -180 ) val = -180; else if( val > 180 ) val = 180;
 			// hue of 0 not working, FECK IT simple fix so pro Selena Gomez best aint no one got time for this shit
 			if( val == 0 ) val = -1;
 			color.hue = val;
+		}
+		
+		// handles brightness change
+		private function setBri(val:int) {
+			if( val < -100 ) val = -100; else if( val > 100 ) val = 100;
+			// assuming brightness of 0 wont work because huehue doesnt. maybe im an ass, but cba to test shit like this
+			if( val == 0 ) val = -1;
+			color.brightness = val;
+		}
+		
+		// update filter and apply to image
+		private function updateFilter(i:int) {
 			filter = new ColorMatrixFilter(color.CalculateFinalFlatArray());
 			lmCost[i].getChildByName("lumGfx").filters = [filter];
-			
 		}
 		
 		// handles showing, updating and positioning of the overlay
@@ -206,8 +243,9 @@
 		private function loadKV() {
 			var _settings = Globals.instance.GameInterface.LoadKVFile('scripts/AbilityValues_settings.kv');
 			defHue = int(_settings["defHue"]);
+			defBri = int(_settings["defBri"]);
 			serverCommand = _settings["serverCommand"];
-			trace("[AbilityValues] KV Loaded, default hue is ", defHue, " and ConVar is ", serverCommand);
+			trace("[AbilityValues] KV Loaded, default hue is ", defHue, ", the default brightness is ", defBri, " and ConVar is ", serverCommand);
 		}
 		
 		public function onLoaded() : void {			
@@ -227,20 +265,20 @@
 			// load values from KV
 			loadKV();
 			
-			
 			// set color defs
-			color.brightness = 0;
+			color.brightness = defBri;
 			color.contrast = 0;
 			color.hue = defHue;
 			color.saturation = 0;
 			
 			//set timer because volvo
-			bestTimer = new Timer(100, 1);
+			bestTimer = new Timer(50, 1);
 			
 			//events
-			gameAPI.SubscribeToGameEvent("dota_player_update_selected_unit", sendEnt);
-			gameAPI.SubscribeToGameEvent("dota_player_update_query_unit", sendEnt);
+			gameAPI.SubscribeToGameEvent("dota_player_update_selected_unit", dotoEventHandle);
+			gameAPI.SubscribeToGameEvent("dota_player_update_query_unit", dotoEventHandle);
 			gameAPI.SubscribeToGameEvent("ability_values_send", prepareDelay);
+			gameAPI.SubscribeToGameEvent("ability_values_force_check", sendEnt);
 			bestTimer.addEventListener(TimerEvent.TIMER, delayEvent);
 		}
 		
