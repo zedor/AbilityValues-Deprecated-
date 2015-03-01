@@ -9,7 +9,7 @@ Adds an additional value to the ability icon
 * Put the files in their correct folders
 * Use `FireGameEvent( 'ability_values_force_check', { player_ID = pID } )` to force a check on the currently selected unit w/o waiting for dota selection events to fire.
 * Use ```FireGameEvent( 'ability_values_send', { player_ID = pID, hue_1 = -80, val_1 = 90, bri_1 = -20 } )``` to show overlay over the 1st ability with hue of -80 and brightness of -20.
-* Use ```FireGameEvent( 'ability_values_send', { player_ID = pID, <stuff> } )``` to show item overlay
+* Use ```FireGameEvent( 'ability_values_send_items', { player_ID = pID, <stuff> } )``` to show item overlay
 * Huehue_1-6 goes from -180 to 180. Leave empty or use 0 to use the default hue set in the AbilityValues_settings.kv
 * Bri_1-6 goes from -100 to 100. Leave empty or use 0 to use the default brightness set in the AbilityValues_settings.kv
 * Val_1-6 goes from iHaveNoIdea to iDontKnow. Leave empty or use 0 to hide, **use -1 to show value of 0!**
