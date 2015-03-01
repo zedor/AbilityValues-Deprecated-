@@ -2,7 +2,7 @@
 
 Adds an additional value to the ability icon
 
-[Preview](http://puu.sh/ge6Bz/7c0b44adab.jpg)
+[Preview](http://puu.sh/gilmX/bcff887a43.jpg)
 
 ###### Usage
 
