@@ -274,7 +274,7 @@
 				buffMc.addChild(addTextToOverlay());
 				lumGfx.scaleX = 0.386;
 				lumGfx.scaleY = 0.26;
-				buffMc.name = "mClip";
+				buffMc.name = "valueOverlay"+i.toString();
 				
 				// add to volvo element so as not to worry about resizing
 				par.addChild(buffMc);
