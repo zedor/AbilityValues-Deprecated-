@@ -280,6 +280,10 @@
 				par.addChild(buffMc);
 				obj[i] = buffMc;
 				obj[i].visible = false;
+				
+				obj[i].mouseEnabled = false;
+				obj[i].mouseChildren = false;
+				
 				i++;
 			}
 		}
@@ -332,7 +336,9 @@
 			Globals.instance.resizeManager.AddListener(this);
 			
 			//add holder to stage
-			this.addChild(holder);
+			//this.addChild(holder); im not even using this what the fuck
+			//holder.mouseEnabled = false;
+			//holder.mouseChildren = false;
 			
 			// load values from KV
 			loadKV();
