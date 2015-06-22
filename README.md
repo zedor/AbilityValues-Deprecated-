@@ -1,3 +1,5 @@
+## Flash/Scaleform is deprecated in Dota2Reborn. No further support for this module.
+
 # AbilityValues
 
 Adds an additional value to the ability icon
